@@ -135,25 +135,19 @@ def process_buses_geojson(input_file, output_file):
                 "id": feature.get('id')
             }
             
-            # Lista para recopilar todas las líneas de este segmento
             bus_line_refs = []
             
-            # Procesar cada relación de bus
             for relation in bus_relations:
                 reltags = relation.get('reltags', {})
                 
-                # Determinar ref: usar ref si existe, sino name
                 ref = reltags.get('ref') or reltags.get('name') or f"sin_ref_{relation.get('rel', 'unknown')}"
                 
                 bus_line_refs.append(ref)
             
-            # Agregar el campo bus_lines como concatenación de todos los refs
             new_feature['properties']['bus_lines'] = ','.join(bus_line_refs)
             
-            # Guardar información de todas las rutas para estadísticas
             for ref in bus_line_refs:
                 if ref not in bus_routes_info:
-                    # Buscar el nombre y route_id de la primera aparición de esta línea
                     route_name = None
                     route_id = None
                     for relation in bus_relations:
@@ -175,47 +169,43 @@ def process_buses_geojson(input_file, output_file):
         
         stats['unique_bus_routes'] = len(bus_routes_info)
         
-        # Crear nuevo GeoJSON
         output_data = {
             "type": "FeatureCollection",
             "generator": "colectivos-processor",
-            "description": "Features de rutas de colectivos - Versión simplificada",
+            "description": "Bus routes features - Simplified",
             "timestamp": data.get('timestamp'),
             "processing_stats": stats,
             "bus_routes_summary": dict(sorted(bus_routes_info.items())),
             "features": highway_features
         }
         
-        # Guardar archivo de salida
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(output_data, f, ensure_ascii=False, indent=2)
         
-        # Mostrar estadísticas
-        print("\n📊 Estadísticas del procesamiento:")
-        print(f"   • Features totales: {stats['total_features']:,}")
-        print(f"   • Features con rutas de colectivos: {stats['features_with_bus_relations']:,}")
-        print(f"   • Rutas de colectivos únicas: {stats['unique_bus_routes']}")
-        print(f"   • Vías pavimentadas: {stats['total_km_paved']:.1f} km")
-        print(f"   • Vías sin pavimentar: {stats['total_km_unpaved']:.1f} km")
-        print(f"   • Total de vías: {stats['total_km_paved'] + stats['total_km_unpaved']:.1f} km")
-        
-        print("\n🚌 Rutas de colectivos encontradas:")
+        print("\n📊 Procedure statistics:")
+        print(f"   • Total features: {stats['total_features']:,}")
+        print(f"   • Features with bus routes: {stats['features_with_bus_relations']:,}")
+        print(f"   • Unique bus routes: {stats['unique_bus_routes']}")
+        print(f"   • Paved roads: {stats['total_km_paved']:.1f} km")
+        print(f"   • Unpaved roads: {stats['total_km_unpaved']:.1f} km")
+        print(f"   • Total roads: {stats['total_km_paved'] + stats['total_km_unpaved']:.1f} km")
+
+        print("\n🚌 Bus routes found:")
         for ref, info in sorted(bus_routes_info.items()):
             name_display = f" - {info['name']}" if info['name'] and info['name'] != ref else ""
-            print(f"   • {ref}{name_display} ({info['segments']} segmentos)")
-        
-        # Información del archivo de salida
+            print(f"   • {ref}{name_display} ({info['segments']} segments)")
+
         input_size = os.path.getsize(input_file) / (1024 * 1024)  # MB
         output_size = os.path.getsize(output_file) / (1024 * 1024)  # MB
         reduction = ((input_size - output_size) / input_size) * 100
-        
-        print(f"\n💾 Archivos:")
-        print(f"   • Entrada: {input_file} ({input_size:.1f} MB)")
-        print(f"   • Salida: {output_file} ({output_size:.1f} MB)")
-        print(f"   • Reducción: {reduction:.1f}%")
-        
-        print(f"\n✅ Procesamiento completado. Archivo guardado: {output_file}")
-        
+
+        print(f"\n💾 Files:")
+        print(f"   • Input: {input_file} ({input_size:.1f} MB)")
+        print(f"   • Output: {output_file} ({output_size:.1f} MB)")
+        print(f"   • Reduction: {reduction:.1f}%")
+
+        print(f"\n✅ Processing completed. File saved: {output_file}")
+
     except FileNotFoundError:
         print(f"❌ Error: No se encontró el archivo {input_file}")
         sys.exit(1)
@@ -228,16 +218,16 @@ def process_buses_geojson(input_file, output_file):
 
 def main():
     """Función principal"""
-    input_file = "colectivos.geojson"
-    output_file = "colectivos-simplificado.geojson"
+    input_file = "buses.geojson"
+    output_file = "buses-simple.geojson"
     
     # Verificar que existe el archivo de entrada
     if not os.path.exists(input_file):
-        print(f"❌ Error: No se encontró {input_file}")
-        print("   Asegúrate de que el archivo esté en el directorio actual")
+        print(f"❌ Error: {input_file} not found")
+        print("   Make sure the file is in the current directory")
         sys.exit(1)
-    
-    print("🚌 Procesador de rutas de colectivos")
+
+    print("🚌 Bus routes processor")
     print("=" * 40)
     
     process_buses_geojson(input_file, output_file)
