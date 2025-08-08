@@ -1,0 +1,43 @@
+[out:json][timeout:60];
+
+// Definimos las áreas
+area["name"="Resistencia"]["admin_level"="8"]["boundary"="administrative"]->.resistencia;
+area["name"="Barranqueras"]["admin_level"="8"]["boundary"="administrative"]->.barranqueras;
+area["name"="Municipio de Fontana"]["admin_level"="7"]["boundary"="administrative"]->.fontana;
+area["name"="Municipio de Puerto Vilelas"]["admin_level"="7"]["boundary"="administrative"]->.vilelas;
+area["name"="Puerto Tirol"]["admin_level"="8"]["boundary"="administrative"]->.tirol;
+area["name"="Municipio de Colonia Benítez"]["admin_level"="7"]["boundary"="administrative"]->.benitez;
+
+// Unimos ambas áreas
+(.resistencia; .barranqueras; .fontana; .vilelas; .tirol; .benitez;)->.zonas;
+
+// Rutas de colectivo en las áreas
+rel
+  ["type"="route"]
+  ["route"="bus"]
+  (area.zonas)->.rutas;
+
+// Ways que forman parte de estas rutas, filtrando por highway/surface/name
+way(r.rutas)
+  [highway]
+  (area.zonas)
+  ->.vias_highway;
+
+way(r.rutas)
+  [surface]
+  (area.zonas)
+  ->.vias_surface;
+
+way(r.rutas)
+  [name]
+  (area.zonas)
+  ->.vias_name;
+
+// Unimos todas las vías filtradas
+(.vias_highway; .vias_surface; .vias_name;)->.vias_filtradas;
+
+// Salida: relaciones + vías filtradas
+(.rutas; .vias_filtradas;);
+out body;
+>;
+out skel qt;
