@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚌 Rutas de Colectivos - Resistencia</title>
+    
+    <!-- Mapbox GL JS -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS específico -->
+    <link rel="stylesheet" href="colectivos.css">
+</head>
+<body>
+    <div id="header">
+        <h1><i class="fas fa-bus"></i> Rutas de Colectivos - Resistencia</h1>
+        <p>Visualización interactiva de las líneas de transporte público</p>
+    </div>
+
+    <div id="statistics-container">
+        <div class="stat-card">
+            <h3>Pavimentado</h3>
+            <div class="number" id="km-pavimentadas">-</div>
+            <div class="unit">kilómetros</div>
+        </div>
+        <div class="stat-card">
+            <h3>Sin Pavimentar</h3>
+            <div class="number" id="km-sin-pavimentar">-</div>
+            <div class="unit">kilómetros</div>
+        </div>
+    </div>
+
+    <div id="filters-panel">
+        <!-- Los filtros se generarán dinámicamente -->
+    </div>
+
+    <div id="mapGranResistencia"></div>
+
+    <!-- Script principal -->
+    <script src="colectivos.js"></script>
+</body>
+</html>
